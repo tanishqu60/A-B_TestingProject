@@ -1,1 +1,97 @@
+/*
+=====================================================================================================
+OBJECTIVE:-TO CLEAN THE UNNECESSARY DATA AND VALIDATE THE DATA BY OUR NEEDS
+          1. CHECK FOR NULL VALUES
+          2. STANDARDIZATION OF DATA
+          3. CHECK FOR DUPLICATE VALUES
+          4. DATA VALIDATION
+          5. EXPERIMENTAL VALIDATION
+=====================================================================================================
+*/
+
+
+--1.Data Cleaning/Data Validation
+
+
+--Total users
+select
+COUNT(distinct user_id) as users
+from
+ab_testing.dbo.dim_users
+
+--Total Events
+select 
+COUNT(*) as Events
+from
+ab_testing.dbo.fact_events
+
+--Event Distribution
+select
+event_name,
+COUNT(*) events
+from 
+ab_testing.dbo.fact_events
+group by event_name
+order by events
+
+
+--Duplicate Event Check
+select
+event_id,
+COUNT(*)
+from 
+ab_testing.dbo.fact_events
+group by event_id
+having COUNT(*)>1
+
+--Missing user check
+select *
+from
+ab_testing.dbo.dim_users
+where user_id is null
+
+
+--2.Experimental Validation
+
+--User Split
+select
+experiment_group,
+count(distinct user_id) users
+from ab_testing.dbo.fact_experiment_exposure
+group by experiment_group
+
+--Traffic Split %
+select
+experiment_group,
+COUNT(*)*100/
+SUM(COUNT(*)) OVER() traffic_pct
+from ab_testing.dbo.fact_experiment_exposure
+group by experiment_group
+
+--Device Balance Check
+select
+u.device_type,
+e.experiment_group,
+COUNT(*) users
+from ab_testing.dbo.fact_experiment_exposure e
+join ab_testing.dbo.dim_users u
+     ON e.user_id=u.user_id
+group by 
+u.device_type,
+e.experiment_group
+
+--Country Balance Check
+select
+u.country,
+e.experiment_group,
+COUNT(*) users
+from ab_testing.dbo.fact_experiment_exposure e
+join ab_testing.dbo.dim_users u
+     ON e.user_id=u.user_id
+group by 
+u.country,
+e.experiment_group
+order by
+u.country,
+e.experiment_group
 
