@@ -1,1 +1,313 @@
+/*
+======================================================================================================================
+OBJECTIVE:- TO FIND THE GROWTH OF COMPANY BY DOING OLD METHOD TESTING AND NEW METHOD TESTING , FOR THIS WE USE VARIOUS
+            KPI IN ORDER TO DETERMINE WHICH IS METHOD GIVES MORE PROFIT TO COMPANY.
+=======================================================================================================================
+KPI'S :- 1.Funnel Analysis
+         2.A/B Testing KPI
+         3.Segmentation Analysis
+         4.Cohort Analysis
+         5.Retention Analysis
+         6.Advance KPI'S
+========================================================================================================================
+*/
+
+
+
+--1.Funnel Analysis
+
+--Building funnel
+select
+experiment_group,
+
+SUM(
+case when event_name='page_view' then 1
+     else 0 end
+) page_views,
+
+SUM(
+case when event_name='search' then 1
+     else 0 end
+) searches,
+
+SUM(
+case when event_name='view_content' then 1
+     else 0 end
+) product_views,
+
+SUM(
+case when event_name='add_to_cart' then 1
+     else 0 end
+) carts,
+
+SUM(
+case when event_name='purchase' then 1
+     else 0 end
+) purchasers
+
+from ab_testing.dbo.fact_events
+group by experiment_group
+
+--Search Rate 
+select
+experiment_group,
+CONCAT(SUM(
+case when event_name='search' then 1
+     else 0 end
+)*100/
+SUM(
+case when event_name='page_view' then 1
+     else 0 end
+) ,'%') search_rate
+from ab_testing.dbo.fact_events
+group by experiment_group
+
+--Add To Cart Rate
+select
+experiment_group,
+CONCAT(SUM(
+case when event_name='add_to_cart' then 1
+     else 0 end
+)*100/
+SUM(
+case when event_name='view_content' then 1
+     else 0 end
+),'%') add_to_cart_rate
+from ab_testing.dbo.fact_events
+group by experiment_group
+
+--Purchase Rate
+select
+experiment_group,
+CONCAT(SUM(
+case when event_name='purchase' then 1
+     else 0 end
+)*100/
+SUM(
+case when event_name='add_to_cart' then 1
+     else 0 end
+),'%') purchase_rate
+from ab_testing.dbo.fact_events
+group by experiment_group
+
+
+--2.Important A/B Testing KPI'S
+--    1.Conversion Rate
+--    2.Revenue Per User
+--    3.Average Order Value(AOV)
+
+--1.Conversion Rate
+with conversions as(
+select
+experiment_group,
+COUNT(distinct user_id) users,
+COUNT(distinct case 
+      when event_name='purchase'
+      then user_id
+      end) purchasers
+from ab_testing.dbo.fact_events
+group by experiment_group
+)
+select *,
+CONCAT(100*purchasers/users,'%') as conversion_rate
+from conversions
+
+--2.Revenue Per User
+select
+e.experiment_group,
+
+SUM(o.order_value)/
+COUNT(distinct e.user_id) revenue_per_user
+
+from ab_testing.dbo.fact_experiment_exposure e
+left join ab_testing.dbo.fact_orders o
+     ON e.user_id=o.user_id
+group by
+e.experiment_group
+
+--3.Average Order Value
+select
+e.experiment_group,
+AVG(o.order_value) AOV
+from ab_testing.dbo.fact_orders o
+join ab_testing.dbo.fact_experiment_exposure e
+     ON o.order_id=e.user_id
+group by e.experiment_group
+
+--3. Segmention Analysis
+
+--Device Analysis
+select
+u.device_type,
+e.experiment_group,
+
+COUNT(distinct e.user_id) users,
+
+COUNT(
+distinct case when o.order_id is not null then e.user_id
+         end)*100/
+COUNT(distinct e.user_id) conversion_rates
+from
+ab_testing.dbo.fact_experiment_exposure e
+join ab_testing.dbo.dim_users u
+     ON e.user_id=u.user_id
+left join ab_testing.dbo.fact_orders o
+     ON e.user_id=o.user_id
+group by
+u.device_type,
+e.experiment_group
+
+--Country Analysis
+select
+u.country,
+e.experiment_group,
+
+AVG(o.order_value) avg_order
+
+from ab_testing.dbo.fact_orders o
+join ab_testing.dbo.dim_users u
+     ON o.user_id=u.user_id
+join ab_testing.dbo.fact_experiment_exposure e
+     ON o.user_id=e.user_id
+group by
+u.country,
+e.experiment_group
+order by
+u.country,
+e.experiment_group
+
+--Age Group Analysis
+select
+u.age_group,
+e.experiment_group,
+
+CONCAT(COUNT(distinct o.user_id)*100/
+COUNT(distinct e.user_id),'%') conversion_rate
+
+from ab_testing.dbo.fact_experiment_exposure e
+join ab_testing.dbo.dim_users u
+     ON e.user_id=u.user_id
+left join ab_testing.dbo.fact_orders o
+     ON e.user_id=o.user_id
+group by
+u.age_group,
+e.experiment_group
+
+
+--4. Cohort Analysis
+
+--Monthly Signup Cohorts
+SELECT
+    DATEADD(MONTH, DATEDIFF(MONTH, 0, signup_date), 0) AS cohort_month,
+    COUNT(*) AS users
+FROM ab_testing.dbo.dim_users
+GROUP BY
+    DATEADD(MONTH, DATEDIFF(MONTH, 0, signup_date), 0)
+ORDER BY
+    cohort_month
+
+
+--5.Retention Analysis
+
+select
+user_id,
+COUNT(distinct SESSION_ID) sessions
+from ab_testing.dbo.fact_events
+group by user_id
+
+
+--6.Advanced KPI'S
+--1.Total Users
+--2.Total Sessions
+--3.Sessions Per User
+--4.Engagement Rate
+--5.Cart Abandonment Rate
+--6.Revenue Per Sesssion
+--7.Orders Per User
+--8.Repeat Purchase Rate
+
+
+--1.Total Users
+select
+COUNT(distinct user_id) users
+from ab_testing.dbo.fact_experiment_exposure
+
+--2.Total Sessions
+select
+COUNT(Distinct SESSION_ID) sessions
+from ab_testing.dbo.fact_events
+
+--3.Sessions Per User
+select
+COUNT(distinct SESSION_ID)
+/
+COUNT(distinct USER_ID) as sessions_per_user
+from ab_testing.dbo.fact_events
+
+--4.Engagement Rate
+select 
+experiment_group,
+CONCAT(COUNT(
+distinct case when event_name in('search','view_content') then user_id
+         end
+)*100/
+COUNT(distinct user_id),'%') engagement_rate
+from
+ab_testing.dbo.fact_events
+group by experiment_group
+
+
+--5.Cart Abandonment Rate
+with funnel as
+(
+select
+experiment_group,
+
+SUM(
+case when event_name='add_to_cart' then 1
+     else 0 end
+) carts,
+
+SUM(
+case when event_name='purchase' then 1
+     else 0 end
+) purchases
+
+from 
+ab_testing.dbo.fact_events
+group by experiment_group
+)
+select *,
+100*(carts-purchases)/
+carts abandonement_rate
+from funnel
+
+--6.Revenue Per Sessions
+select
+SUM(revenue)
+/
+COUNT(distinct session_id) revenue_per_session
+from ab_testing.dbo.fact_events
+
+--7.Orders Per User
+select
+COUNT(order_id)*1.0/
+COUNT(distinct user_id) as orders_per_user
+from
+ab_testing.dbo.fact_orders
+
+--8.Repeat Purchase Rate
+with order_cte as
+(
+select 
+user_id,
+COUNT(*) orders
+from ab_testing.dbo.fact_orders
+group by user_id
+)
+select
+CONCAT(100*COUNT(case when orders>1 then 1
+          end)/
+COUNT(*),'%') as repeat_purchase_rate
+from order_cte
 
