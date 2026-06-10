@@ -1,1 +1,186 @@
+/* 
+===================================================================================================================================
+Objective : 1. Using Various test to identify which group is best.
+            2. Finding the group which increases the revenue.
+            3. Daily basis conversion rate of both.
+===================================================================================================================================
+Test Used : 1. Z-Test
+            2. Confidence Interval
+            3. Cohen's D
+            4. Statistical Power
+            5. Daily conversion trend
+            6. Revenue Uplift
+===================================================================================================================================
+*/
+           
 
+
+# Z-TEST
+from statsmodels.stats.proportion import proportions_ztest
+control=df[df.experiment_group=="Control"]
+test=df[df.experiment_group=="Test"]
+count=[control.purchased.sum(),
+       test.purchased.sum()]
+nobs=[len(control),
+      len(test)]
+z,p=proportions_ztest(
+    count,
+    nobs)
+print(z)
+print(p)
+
+# Since p value comes out 2.416e-31 which is p < 0.05
+# and z value comes out to be -11.645
+# So, we can reject the null hypothesis and say both control and test group are different
+# and from z value we can indicate that,
+# Since, +-2 is strong evidence that test group has high conversion rate
+# But in our case it is -11.645 means , we can strongly say that test group has higher conversion rate the control group
+
+
+# Verifying Which group is better
+control_rate = control.purchased.mean()
+test_rate = test.purchased.mean()
+
+print("Control rate:", control_rate)
+print("Test rate:", test_rate)
+
+#Result : we get from verification that
+# control group converted at a rate of 61.8%
+# test group converted at a rate of 72.8%
+# Conclusion : We can say that test group perform outstanding
+
+print(count)
+print(nobs)
+
+
+# Confidence interval
+import numpy as np
+control_cr = control.purchased.mean()
+test_cr = test.purchased.mean()
+
+diff = test_cr - control_cr
+
+se = np.sqrt((control_cr*(1-control_cr)/len(control))
+             +
+             (test_cr*(1-test_cr)/len(test))
+            )
+lower = diff - 1.96*se
+upper = diff + 1.96*se
+
+print(lower)
+print(upper)
+
+# Result : Since, in this we calculated the 95% confidence interval
+# So, our lower interval is 0.0910
+# and upper interval is 0.1275
+# which means test group conversion rate is atleast 9.1% higher than control group 
+# also atmost 12.75% higher than control group 
+# Conclusion : The A/B test shows that the Test variation increased the purchase conversion rate 
+#              by approximately 9.1% to 12.75% (95% confidence interval). Since the entire confidence 
+#              interval is above zero and the p-value is effectively zero, the Test version significantly 
+#              outperformed the Control version.
+print(diff)
+
+# Difference indicate that mid point of this interval is 0.109
+# which means most probably test group conversion rate is 10.9% higher than control group
+
+
+# Cohen's D
+pooled_std = np.sqrt(
+    ( control.purchased.var()
+      +
+      test.purchased.var()
+    )/2
+)
+
+cohens_d = (
+    test_cr - control_cr
+)/pooled_std
+
+print(cohens_d)
+
+# Result : here , cohens value is come out to be 0.23460
+#          which means there is small difference in effect size according to common benchmark given by cohen
+# Conclusion : The A/B test shows a statistically significant improvement in conversions for the Test group (p < 0.001).
+#              The estimated uplift is between 9.1% and 12.8% (95% confidence interval). The effect size (Cohen's d ≈ 0.235)
+#              is small by conventional standards, indicating that while the improvement is reliable, its magnitude relative 
+#              to overall variation is moderate.
+
+
+# Statistical Power
+from statsmodels.stats.power import NormalIndPower
+analysis = NormalIndPower()
+
+power = analysis.solve_power(
+    effect_size = 0.2,
+    nobs1 = len(control),
+    alpha = 0.05
+)
+print(power)
+
+# Result : We get a power of nearly 1.
+#         which means If a real effect of size 0.2 (small effect) exists,
+#         our experiment has almost a 100% chance of detecting it as statistically significant.
+# Conclusion : 1.our sample size is more than enough.
+#              2.we are almost guaranteed to detect even small differences.
+#              3.The risk of missing a real effect (Type II error) is essentially zero.
+
+
+# Daily Conversion Trend
+daily_conversion = (
+    df.groupby(['exposure_time','experiment_group']
+              )['purchased']
+               .mean()
+               .reset_index()
+)
+
+print(daily_conversion)
+
+# Result : It gives daily convertion from each group test or control.
+# Conclusion : We conclude that test group is performing very well on daily basis conversion rate. 
+
+
+# Revenue uplift
+orders_exp = (
+    orders.merge(
+        experiment,
+        on = 'user_id',
+        how = 'inner'
+    )
+)
+
+revenue_summary = (
+    orders_exp
+    .groupby('experiment_group')
+    ['order_value']
+    .agg(
+        ['sum','mean','count']
+    )
+)  
+
+control_rev = (
+    orders_exp[orders_exp.experiment_group == 'Control']
+    ['order_value']
+    .sum()
+)
+
+test_rev = (
+    orders_exp[orders_exp.experiment_group == 'Test']
+    ['order_value']
+    .sum()
+)
+
+revenue_uplift = (
+    (test_rev - control_rev)
+    /
+    control_rev
+)*100
+
+print(revenue_uplift)
+
+# Result : We get a revenue uplift of 28.34 %
+# Conclusion : The Test variant increased total revenue by approximately 28.35% compared to the Control group.
+
+# Final Conclusion :
+The Test variant significantly outperforms the Control variant in both conversion rate and revenue generation. 
+The improvement is statistically significant, highly reliable, and results in a strong +28% revenue uplift.
