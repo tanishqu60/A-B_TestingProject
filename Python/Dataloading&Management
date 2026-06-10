@@ -1,1 +1,41 @@
+/*
+=======================================================================================================================================
+Objective : In this 
+            1. We read the data and stored that data in variables.
+            2. Manage the data and establishing connect between future use data.
+=======================================================================================================================================
+*/
 
+# Load Data
+import pandas as pd
+users=pd.read_csv(r"C:\Users\tanis\OneDrive\All_DataSet\google_analytics_ab_testing_50k_events\dim_users.csv")
+events=pd.read_csv(r"C:\Users\tanis\OneDrive\All_DataSet\google_analytics_ab_testing_50k_events\fact_events.csv")
+orders=pd.read_csv(r"C:\Users\tanis\OneDrive\All_DataSet\google_analytics_ab_testing_50k_events\fact_orders.csv")
+experiment=pd.read_csv(r"C:\Users\tanis\OneDrive\All_DataSet\google_analytics_ab_testing_50k_events\fact_experiment_exposure.csv")
+print(users)
+
+# Build User-Level Dataset
+purchases=(events[events.event_name=="purchase"]
+    .groupby("user_id")
+    .size()
+    .reset_index(name="purchased")
+          )
+purchases["purchased"]=1
+
+df=experiment.merge(
+    purchases,
+    on="user_id",
+    how="left"
+)
+df["purchased"]=(
+    df["purchased"]
+        .fillna(0)
+)
+print(purchases)
+
+# Conversion Summary
+summary=(
+    df.groupby("experiment_group")["purchased"]
+    .agg(["count","sum","mean"])
+)
+print(summary)
