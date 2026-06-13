@@ -1,0 +1,122 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "2d6f9fa7269ab67315eb",
+  "position": {
+    "x": 510.46483190673212,
+    "y": 155.06055377812024,
+    "z": 6000,
+    "height": 565.35352350960659,
+    "width": 749.23064037923587,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "experiment_stastistics"
+                    }
+                  },
+                  "Property": "ci_lower"
+                }
+              },
+              "queryRef": "experiment_stastistics.ci_lower",
+              "nativeQueryRef": "CONTROL_INTERVAL_UPPER",
+              "displayName": "CONTROL_INTERVAL_UPPER"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "experiment_stastistics"
+                    }
+                  },
+                  "Property": "ci_upper"
+                }
+              },
+              "queryRef": "experiment_stastistics.ci_upper",
+              "nativeQueryRef": "CONTROL_INTERVAL_LOWER",
+              "displayName": "CONTROL_INTERVAL_LOWER"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "experiment_stastistics"
+                  }
+                },
+                "Property": "ci_lower"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "valueAxis": [
+        {
+          "properties": {
+            "gridlineShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "legend": [
+        {
+          "properties": {
+            "showGradientLegend": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'CONTROL_INTERVALS'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

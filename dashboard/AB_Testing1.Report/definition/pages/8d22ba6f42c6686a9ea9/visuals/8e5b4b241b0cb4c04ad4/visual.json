@@ -1,0 +1,57 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "8e5b4b241b0cb4c04ad4",
+  "position": {
+    "x": 35.677649541868377,
+    "y": 130.36064255682675,
+    "z": 0,
+    "height": 118.01068694618002,
+    "width": 285.421196334947,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "experiment_stastistics"
+                    }
+                  },
+                  "Property": "uplift%"
+                }
+              },
+              "queryRef": "experiment_stastistics.uplift%",
+              "nativeQueryRef": "REVENUE_UPLIFT_PERCENTAGE",
+              "displayName": "REVENUE_UPLIFT_PERCENTAGE"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "experiment_stastistics"
+                  }
+                },
+                "Property": "uplift%"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

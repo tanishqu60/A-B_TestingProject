@@ -1,0 +1,87 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 279.93897608020916,
+            "y": 20.080460551438136
+          },
+          "nodeIndex": "dim_users",
+          "nodeLineageTag": "c0afdbb6-5627-4565-b846-6ab4d5cfb688",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 3
+        },
+        {
+          "location": {
+            "x": 777.14273186922708,
+            "y": 297.61148659590634
+          },
+          "nodeIndex": "fact_events",
+          "nodeLineageTag": "3fb8da53-eae7-4dea-880a-05fce4c3cafd",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 751.48965798517736,
+            "y": 18.699061052745549
+          },
+          "nodeIndex": "fact_experiment_exposure",
+          "nodeLineageTag": "5006ebe0-9487-4a77-9b35-6a5f8a50abc3",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 296.18026423136274,
+            "y": 332.13018991412827
+          },
+          "nodeIndex": "fact_orders",
+          "nodeLineageTag": "90a77fc7-3da2-44b9-ac4a-65f32c86f076",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 1113.2855152927823,
+            "y": 124.86510117978042
+          },
+          "nodeIndex": "experiment_stastistics",
+          "nodeLineageTag": "2b431c71-6768-400f-add8-ece59b6d31fd",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 56.913695073895653,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

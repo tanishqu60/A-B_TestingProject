@@ -1,0 +1,57 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "4b2d4907dda3020ea9bd",
+  "position": {
+    "x": 0,
+    "y": 74.099733663880471,
+    "z": 0,
+    "height": 102.91629675538954,
+    "width": 128.98842526675489,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_experiment_exposure"
+                    }
+                  },
+                  "Property": "Users"
+                }
+              },
+              "queryRef": "fact_experiment_exposure.Users",
+              "nativeQueryRef": "USERS",
+              "displayName": "USERS"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "fact_experiment_exposure"
+                  }
+                },
+                "Property": "Users"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

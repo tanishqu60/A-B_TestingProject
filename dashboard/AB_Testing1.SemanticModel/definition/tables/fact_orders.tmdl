@@ -1,0 +1,94 @@
+table fact_orders
+	lineageTag: 90a77fc7-3da2-44b9-ac4a-65f32c86f076
+
+	measure Revenue = ```
+			SUM(fact_orders[order_value]) 
+			```
+		formatString: 0
+		lineageTag: 8b5b7edd-d5e5-471b-84c3-26b458d8422c
+
+	measure Purchasers = ```
+			DISTINCTCOUNT(fact_orders[user_id]) 
+			```
+		formatString: 0
+		lineageTag: bf824e2c-6b18-4e0f-80a1-c7d72ca82816
+
+	measure Conversion_Rate = ```
+			([Purchasers]/[Users])*100 
+			```
+		lineageTag: 2d1ea474-6293-4568-a283-af95e27ac002
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Revenue_per_user = ```
+			([Revenue]/[Users]) 
+			```
+		lineageTag: 1a96efc3-1870-4a25-8930-42afea79f8db
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure AOV = ([Revenue]/COUNTROWS(fact_orders))
+		lineageTag: 46cd0eaa-9e58-49d6-8640-1a2d6b0a170f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure uplift_perc = VAR TestCR = CALCULATE([Conversion_Rate],fact_experiment_exposure[experiment_group]="Test") VAR ControlCR = CALCULATE([Conversion_Rate],fact_experiment_exposure[experiment_group]="Control") RETURN ((TestCR-ControlCR)*100/(ControlCR))
+		lineageTag: b0839369-831f-4376-ba8c-380c6b0c10b0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column order_id
+		dataType: int64
+		formatString: 0
+		lineageTag: fdb40aa1-80e4-42f4-8813-84299e387054
+		summarizeBy: sum
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 4ad14a5b-ab43-4eb9-8bb6-1083ac789639
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_value
+		dataType: int64
+		formatString: 0
+		lineageTag: 9ba2f33a-74d6-438e-b822-345747fe1608
+		summarizeBy: sum
+		sourceColumn: order_value
+
+		annotation SummarizationSetBy = Automatic
+
+	column purchase_time
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 75a67ce9-af89-40a5-9f36-a0b1ac41b8fc
+		summarizeBy: none
+		sourceColumn: purchase_time
+
+		variation Variation
+			isDefault
+			relationship: b99272b3-687c-4132-82fd-661a2955f4de
+			defaultHierarchy: LocalDateTable_ae746db9-905f-4ed7-b1d5-73ecfa3cddb6.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition fact_orders = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\tanis\OneDrive\All_DataSet\google_analytics_ab_testing_50k_events\fact_orders.csv"),[Delimiter=",", Columns=4, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"order_id", Int64.Type}, {"user_id", Int64.Type}, {"order_value", Int64.Type}, {"purchase_time", type date}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

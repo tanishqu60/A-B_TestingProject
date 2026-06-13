@@ -1,0 +1,76 @@
+table dim_users
+	lineageTag: c0afdbb6-5627-4565-b846-6ab4d5cfb688
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 58ccace1-01d3-405e-bd71-4a2cd9afd203
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column country
+		dataType: string
+		lineageTag: 9ce99c77-f8aa-48eb-a52f-a9d3792135c6
+		summarizeBy: none
+		sourceColumn: country
+
+		annotation SummarizationSetBy = Automatic
+
+	column device_type
+		dataType: string
+		lineageTag: 9f8ccef0-4786-4334-9507-5ce16349b757
+		summarizeBy: none
+		sourceColumn: device_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column age_group
+		dataType: string
+		lineageTag: ec823181-6105-4999-9745-7be23e1c0f09
+		summarizeBy: none
+		sourceColumn: age_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column signup_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 9a2f6ef1-351f-49a1-a61e-7dedc3cf7bd0
+		summarizeBy: none
+		sourceColumn: signup_date
+
+		variation Variation
+			isDefault
+			relationship: d6c3662f-b038-4e9e-ab2f-3f09657d1cd6
+			defaultHierarchy: LocalDateTable_2a82e285-6c1c-4338-92a5-0902e61f277b.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column experiment_group
+		dataType: string
+		lineageTag: 6ee47f1a-9bf1-4bb0-90cd-477e7b767f63
+		summarizeBy: none
+		sourceColumn: experiment_group
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_users = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\tanis\OneDrive\All_DataSet\google_analytics_ab_testing_50k_events\dim_users.csv"),[Delimiter=",", Columns=5, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Use First Row as Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Change Type" = Table.TransformColumnTypes(#"Use First Row as Headers",{{"user_id", Int64.Type}, {"country", type text}, {"device_type", type text}, {"age_group", type text}, {"signup_date", type date}}),
+				    #"Merged Queries" = Table.NestedJoin(#"Change Type", {"user_id"}, fact_experiment_exposure, {"user_id"}, "fact_experiment_exposure", JoinKind.LeftOuter),
+				    #"Expanded fact_experiment_exposure" = Table.ExpandTableColumn(#"Merged Queries", "fact_experiment_exposure", {"experiment_group"}, {"experiment_group"})
+				in
+				    #"Expanded fact_experiment_exposure"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

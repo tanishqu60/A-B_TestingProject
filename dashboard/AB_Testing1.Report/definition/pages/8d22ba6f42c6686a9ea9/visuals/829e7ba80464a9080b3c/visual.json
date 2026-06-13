@@ -1,0 +1,57 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "829e7ba80464a9080b3c",
+  "position": {
+    "x": 21.955476641149769,
+    "y": 323.84328045695912,
+    "z": 3000,
+    "height": 150.94390190790466,
+    "width": 289.53784820516256,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "experiment_stastistics"
+                    }
+                  },
+                  "Property": "control_cr"
+                }
+              },
+              "queryRef": "experiment_stastistics.control_cr",
+              "nativeQueryRef": "CONTROL_CONVERSION_RATE",
+              "displayName": "CONTROL_CONVERSION_RATE"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "experiment_stastistics"
+                  }
+                },
+                "Property": "control_cr"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

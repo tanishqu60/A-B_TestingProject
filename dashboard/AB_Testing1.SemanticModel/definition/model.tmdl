@@ -1,0 +1,27 @@
+model Model
+	culture: en-IN
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-IN
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["dim_users","fact_events","fact_experiment_exposure","fact_orders","experiment_stastistics"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table dim_users
+ref table DateTableTemplate_4d01e489-84c6-4d48-adbe-72a0845a9e7f
+ref table LocalDateTable_2a82e285-6c1c-4338-92a5-0902e61f277b
+ref table fact_events
+ref table LocalDateTable_4ea02812-670d-4262-9d0b-69394da833b1
+ref table fact_experiment_exposure
+ref table LocalDateTable_d409a1b0-5234-4752-8a17-141ae31e765c
+ref table fact_orders
+ref table LocalDateTable_ae746db9-905f-4ed7-b1d5-73ecfa3cddb6
+ref table experiment_stastistics
+
+ref cultureInfo en-IN
+

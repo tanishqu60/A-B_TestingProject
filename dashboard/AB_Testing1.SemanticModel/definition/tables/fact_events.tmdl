@@ -1,0 +1,129 @@
+table fact_events
+	lineageTag: 3fb8da53-eae7-4dea-880a-05fce4c3cafd
+
+	measure Page_Views = CALCULATE(COUNTROWS(fact_events),fact_events[event_name]="page_view" )
+		formatString: 0
+		lineageTag: 687b3aa0-77cd-4513-8a0a-c90971320078
+
+	measure Searches = ```
+			CALCULATE(COUNTROWS(fact_events),fact_events[event_name]="search") 
+			```
+		formatString: 0
+		lineageTag: 48e52698-f6b1-4c63-be5f-2a55db7e843d
+
+	measure Product_Views = ```
+			CALCULATE(COUNTROWS(fact_events),fact_events[event_name]="view_content") 
+			```
+		formatString: 0
+		lineageTag: 6ae51e98-bcc7-4158-b38c-0c4e36a50e98
+
+	measure Carts = ```
+			CALCULATE(COUNTROWS(fact_events),fact_events[event_name]="add_to_cart") 
+			```
+		formatString: 0
+		lineageTag: c2e03c9b-e7ce-4b00-afb7-66a630c1df4f
+
+	measure Purchases = ```
+			CALCULATE(COUNTROWS(fact_events),fact_events[event_name]="purchase") 
+			```
+		formatString: 0
+		lineageTag: 2dacfacb-f545-467e-bedd-5057d1ffbcd8
+
+	measure Total_sessions = ```
+			DISTINCTCOUNT(fact_events[session_id]) 
+			```
+		formatString: 0
+		lineageTag: 5f4611b0-e374-49be-9ba3-4da42aa90ed7
+
+	measure Returning_users = COUNTROWS(FILTER(ADDCOLUMNS(VALUES(dim_users[user_id]),"SessionCount",CALCULATE(DISTINCTCOUNT(fact_events[session_id]))),[SessionCount]>1))
+		formatString: 0
+		lineageTag: 992a5392-34db-427c-909e-0c28666975af
+
+	measure Returning_user_perc = ```
+			([Returning_users]/[Users])*100 
+			```
+		lineageTag: edabb563-ecd2-422c-8074-58a1f4feae3e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Sessions_per_user = CALCULATE(DISTINCTCOUNT(fact_events[session_id]))
+		formatString: 0
+		lineageTag: 36bc02c5-2061-4960-9077-f04568ee05ab
+
+	column event_id
+		dataType: int64
+		formatString: 0
+		lineageTag: c5f43fd2-f674-4b0a-99a3-a35bb3552af3
+		summarizeBy: sum
+		sourceColumn: event_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		lineageTag: c3b6932f-5d4b-41c4-8367-1793e88efe3a
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column session_id
+		dataType: string
+		lineageTag: 24530eff-b833-4306-a215-9f1f3c3c8689
+		summarizeBy: none
+		sourceColumn: session_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column timestamp
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 483efbf3-63f3-4889-a3f6-084294c1312e
+		summarizeBy: none
+		sourceColumn: timestamp
+
+		variation Variation
+			isDefault
+			relationship: f95a96c7-be56-494d-a789-6c7ec653f0b7
+			defaultHierarchy: LocalDateTable_4ea02812-670d-4262-9d0b-69394da833b1.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_name
+		dataType: string
+		lineageTag: 09e7cbca-8dbb-4dd5-ab1a-c19c5dd4b29b
+		summarizeBy: none
+		sourceColumn: event_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column experiment_group
+		dataType: string
+		lineageTag: ea443635-6d12-4c38-9f47-be397d588203
+		summarizeBy: none
+		sourceColumn: experiment_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column revenue
+		dataType: int64
+		formatString: 0
+		lineageTag: 5d5f98b2-551c-4e54-986d-624f55d71ede
+		summarizeBy: sum
+		sourceColumn: revenue
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_events = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\tanis\OneDrive\All_DataSet\google_analytics_ab_testing_50k_events\fact_events.csv"),[Delimiter=",", Columns=7, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"event_id", Int64.Type}, {"user_id", Int64.Type}, {"session_id", type text}, {"timestamp", type datetime}, {"event_name", type text}, {"experiment_group", type text}, {"revenue", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

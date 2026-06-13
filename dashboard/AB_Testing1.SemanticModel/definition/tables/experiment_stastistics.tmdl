@@ -1,0 +1,81 @@
+table experiment_stastistics
+	lineageTag: 2b431c71-6768-400f-add8-ece59b6d31fd
+
+	measure Z_value = CALCULATE(MAX(experiment_stastistics[value]),experiment_stastistics[metric]="z_score")
+		lineageTag: d5163400-6796-43e6-949c-2f9ebc65064d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure P_value = CALCULATE(MAX(experiment_stastistics[value]),experiment_stastistics[metric]="p_value")
+		lineageTag: 60a43151-05b1-454f-9645-9aa9acfdb3ba
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure uplift% = CALCULATE(MAX(experiment_stastistics[value]),experiment_stastistics[metric]="uplift_pct")
+		lineageTag: 3999797f-c48a-40ce-9161-af123198d740
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure control_cr = ```
+			CALCULATE(MAX(experiment_stastistics[value]),experiment_stastistics[metric]="control_cr") 
+			```
+		lineageTag: f22e4cf0-7cb5-4b9f-8f84-f01187868028
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure test_cr = ```
+			CALCULATE(MAX(experiment_stastistics[value]),experiment_stastistics[metric]="test_cr") 
+			```
+		lineageTag: 5ed90b62-0fff-483b-ba52-96d2b87902cb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ci_lower = ```
+			CALCULATE(MAX(experiment_stastistics[value]),experiment_stastistics[metric]="ci_lower") 
+			```
+		lineageTag: 058a0659-d86f-4b6a-83ee-c0c951685f17
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ci_upper = ```
+			CALCULATE(MAX(experiment_stastistics[value]),experiment_stastistics[metric]="ci_upper") 
+			```
+		lineageTag: 83ce7f0f-8ba8-4b2b-94e2-704de6cf104a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Cohens_d = CALCULATE(MAX(experiment_stastistics[value]),experiment_stastistics[metric]="cohens_d")
+		lineageTag: 6d821b7a-63d1-4657-bedf-fa82870e7a1e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column metric
+		dataType: string
+		lineageTag: 15e82ecc-a3d4-49d7-81f8-217e8455e82e
+		summarizeBy: none
+		sourceColumn: metric
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: double
+		lineageTag: 9d395bf8-f9b8-474c-aaf9-18c9db9aa810
+		summarizeBy: sum
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition experiment_stastistics = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\tanis\OneDrive\All_DataSet\google_analytics_ab_testing_50k_events\experiment_stastistics.csv"),[Delimiter=",", Columns=2, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"metric", type text}, {"value", type number}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

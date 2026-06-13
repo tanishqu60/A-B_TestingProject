@@ -1,0 +1,32 @@
+relationship d6c3662f-b038-4e9e-ab2f-3f09657d1cd6
+	joinOnDateBehavior: datePartOnly
+	fromColumn: dim_users.signup_date
+	toColumn: LocalDateTable_2a82e285-6c1c-4338-92a5-0902e61f277b.Date
+
+relationship f95a96c7-be56-494d-a789-6c7ec653f0b7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: fact_events.timestamp
+	toColumn: LocalDateTable_4ea02812-670d-4262-9d0b-69394da833b1.Date
+
+relationship 10826cff-5558-4d89-a335-95cf40ee619c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: fact_experiment_exposure.exposure_time
+	toColumn: LocalDateTable_d409a1b0-5234-4752-8a17-141ae31e765c.Date
+
+relationship b99272b3-687c-4132-82fd-661a2955f4de
+	joinOnDateBehavior: datePartOnly
+	fromColumn: fact_orders.purchase_time
+	toColumn: LocalDateTable_ae746db9-905f-4ed7-b1d5-73ecfa3cddb6.Date
+
+relationship 00cffb60-eb24-760a-dd04-d961b47d3665
+	fromColumn: fact_events.user_id
+	toColumn: dim_users.user_id
+
+relationship 0ab43563-93d9-a4a6-8153-51fc6d39d927
+	fromColumn: fact_orders.user_id
+	toColumn: dim_users.user_id
+
+relationship aa3f5850-6b83-25b4-f3a7-e45f247709f1
+	fromColumn: fact_experiment_exposure.user_id
+	toColumn: dim_users.user_id
+
